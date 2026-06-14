@@ -288,7 +288,7 @@ func binarySearchPatientByID() { //prosedur ini untuk meng output hasil dari fun
 	}
 }
 
-func selectionSortVisitsByDate() { //sorting pasien berdasarkan tanggal kunjungan dengan selection sort secara ascending 
+func selectionSortVisitsByDate() { //sorting pasien berdasarkan tanggal kunjungan dengan selection sort secara ascending
 	i := 0
 	for i < visitCount-1 {
 		minIdx := i
@@ -312,12 +312,12 @@ func selectionSortVisitsByDate() { //sorting pasien berdasarkan tanggal kunjunga
 	}
 }
 
-func insertionSortVisitsByTotal() { //sorting pasien berdasarkan tanggal kunjungan dengan insertion sort secara ascending
+func insertionSortVisitsByTotal() { //sorting pasien berdasarkan tanggal kunjungan dengan insertion sort secara descending
 	i := 1
 	for i < visitCount {
 		key := visits[i]
 		j := i - 1
-		for j >= 0 && visits[j].Total > key.Total {
+		for j >= 0 && visits[j].Total < key.Total {
 			visits[j+1] = visits[j]
 			j = j - 1
 		}
@@ -376,8 +376,185 @@ func statsMostPopularService() { //prosedur ini di gunakan untuk melihat layanan
 	s := services[maxIdx]
 	fmt.Println("Layanan paling populer:", s.ID, s.Name, "dengan jumlah:", maxCount)
 }
+// Testing dengan data dummy
+func MemasukkanData() { //prosedur untuk memasukkan data dummy ke 
+	fmt.Println("=== Memasukkan data ===")
+ 
+	patients[0] = Patient{ID: 1, Name: "Rakan", Age: 20, Phone: "081234567890"}
+	patients[1] = Patient{ID: 2, Name: "Aldo", Age: 19, Phone: "082345678901"}
+	patients[2] = Patient{ID: 3, Name: "Adnan", Age: 26, Phone: "083456789012"}
+	patientCount = 3
+	fmt.Println("Pasien: Rakan(1), Aldo(2), Adnan(3)")
+ 
+	services[0] = Service{ID: 1, Name: "Facial", Price: 150000}
+	services[1] = Service{ID: 2, Name: "Massage", Price: 200000}
+	services[2] = Service{ID: 3, Name: "Peeling", Price: 100000}
+	serviceCount = 3
+	fmt.Println("Layanan: Facial(1), Massage(2), Peeling(3)")
+ 
+	visits[0] = Visit{PatientID: 1, ServiceID: 2, Date: 20250610, Total: services[1].Price, Note: "Kontrol_rutin"}
+	visits[1] = Visit{PatientID: 2, ServiceID: 2, Date: 20250608, Total: services[1].Price, Note: "Kulit_kering"}
+	visits[2] = Visit{PatientID: 3, ServiceID: 1, Date: 20250610, Total: services[0].Price, Note: "Perdana"}
+	visits[3] = Visit{PatientID: 1, ServiceID: 3, Date: 20250605, Total: services[2].Price, Note: "Jerawat"}
+	visitCount = 4
+	fmt.Println("4 kunjungan ditambahkan")
+	fmt.Println("======= Selesai =======")
+	fmt.Println()
+}
+ 
+func runAllTests() {
+	fmt.Println("TESTING MULAI")
+ 
+	// Test 1: list pasien
+	fmt.Println("\n[TEST 1] listPatients — data: Rakan, Aldo, Adnan")
+	listPatients()
+ 
+	// Test 2: binary search ketemu
+	fmt.Println("\n[TEST 2] Binary search ID=2 — Nama yang diinginkan: Aldo")
+	idx := findPatientIndexByID(2)
+	if idx != -1 {
+		p := patients[idx]
+		fmt.Println("Ditemukan:", p.ID, p.Name, p.Age, p.Phone)
+	} else {
+		fmt.Println("GAGAL: seharusnya ditemukan")
+	}
+ 
+	// Test 3: binary search tidak ketemu
+	fmt.Println("\n[TEST 3] Binary search ID=99 — karna data tidak ada mmaka: tidak ditemukan")
+	if findPatientIndexByID(99) == -1 {
+		fmt.Println("Benar: tidak ditemukan")
+	} else {
+		fmt.Println("GAGAL: seharusnya -1")
+	}
+ 
+	// Test 4: sequential search ketemu
+	fmt.Println("\n[TEST 4] Sequential search 'Rakan' — ekspektasi: ditemukan")
+	testSearchByName("Rakan")
+ 
+	// Test 5: sequential search tidak ketemu
+	fmt.Println("\n[TEST 5] Sequential search 'Kayla' — ekspektasi: tidak ditemukan")
+	testSearchByName("Kayla")
+ 
+	// Test 6: update pasien
+	fmt.Println("\n[TEST 6] Update pasien ID=3 -> Antony, 29 tahun")
+	index3 := findPatientIndexByID(3)
+	patients[index3].Name = "Antony"
+	patients[index3].Age = 29
+	fmt.Println("Setelah update:")
+	listPatients()
+ 
+	// Test 7: delete pasien
+	fmt.Println("\n[TEST 7] Hapus pasien ID=2 — Maka data akan tersisa Rakan dan Antony")
+	testDeletePatient(2)
+	listPatients()
+ 
+	// Test 8: list layanan
+	fmt.Println("\n[TEST 8] listServices — data: Facial, Massage, Peeling")
+	listServices()
+ 
+	// Test 9: update layanan
+	fmt.Println("\n[TEST 9] Update layanan ID=1 -> Botox, 300000")
+	serviceindex1 := findServiceIndexByID(1)
+	services[serviceindex1].Name = "Botox"
+	services[serviceindex1].Price = 300000
+	listServices()
+ 
+	// Test 10: delete layanan
+	fmt.Println("\n[TEST 10] Hapus layanan ID=3 maka data layanan tersisa Botox & Massage")
+	testDeleteService(3)
+	listServices()
+ 
+	// Test 11: list kunjungan
+	fmt.Println("\n[TEST 11] listVisits akan ada 4 kunjungan")
+	listVisits()
+ 
+	// Test 12: selection sort
+	fmt.Println("\n[TEST 12] Selection sort by tanggal data secara ascending: 20250605, 20250608, 20250610, 20250610")
+	selectionSortVisitsByDate()
+ 
+	// Test 13: insertion sort
+	fmt.Println("\n[TEST 13] Insertion sort by total data secara descending: 200000, 200000, 150000, 100000")
+	insertionSortVisitsByTotal()
+ 
+	// Test 14: statistik harian
+	fmt.Println("\n[TEST 14] Statistik tanggal 20250610 maka akan ada 2 kunjungan")
+	testCountVisitsByDate(20250610)
+ 
+	// Test 15: layanan populer
+	fmt.Println("\n[TEST 15] Layanan paling populer adalah Massage (ID=2), jumlah 2")
+	statsMostPopularService()
+ 
+	// Test 16: case jika pasien tidak ada
+	fmt.Println("\n[TEST 16] Edge case: pasienID=99 — ekspektasi: tidak ditemukan")
+	if findPatientIndexByID(99) == -1 {
+		fmt.Println("Benar: pasien tidak ditemukan")
+	}
+ 
+	// Test 17: case jika layanan tidak ada
+	fmt.Println("\n[TEST 17] Edge case: serviceID=99 — ekspektasi: tidak ditemukan")
+	if findServiceIndexByID(99) == -1 {
+		fmt.Println("Benar: layanan tidak ditemukan")
+	}
+ 
+	fmt.Println("TESTING SELESAI")
+	fmt.Println()
+}
+ 
+// func tanpa fmt.Scan khusus untuk testing 
+ 
+func testSearchByName(name string) {
+	found := false
+	for i := 0; i < patientCount; i++ {
+		if patients[i].Name == name {
+			p := patients[i]
+			fmt.Println("Ditemukan:", p.ID, p.Name, p.Age, p.Phone)
+			found = true
+		}
+	}
+	if !found {
+		fmt.Println("Tidak ditemukan")
+	}
+}
+ 
+func testDeletePatient(id int) {
+	idx := findPatientIndexByID(id)
+	if idx == -1 {
+		fmt.Println("Pasien tidak ditemukan")
+		return
+	}
+	for i := idx; i < patientCount-1; i++ {
+		patients[i] = patients[i+1]
+	}
+	patientCount--
+	fmt.Println("Pasien ID", id, "dihapus")
+}
+ 
+func testDeleteService(id int) {
+	idx := findServiceIndexByID(id)
+	if idx == -1 {
+		fmt.Println("Layanan tidak ditemukan")
+		return
+	}
+	for i := idx; i < serviceCount-1; i++ {
+		services[i] = services[i+1]
+	}
+	serviceCount--
+	fmt.Println("Layanan ID", id, "dihapus")
+}
+ 
+func testCountVisitsByDate(date int) {
+	cnt := 0
+	for i := 0; i < visitCount; i++ {
+		if visits[i].Date == date {
+			cnt++
+		}
+	}
+	fmt.Println("Jumlah kunjungan pada", date, ":", cnt)
+}
 
 func main() {
+	MemasukkanData()
+	runAllTests()
 	var choice int
     choice = -1
     for choice != 0 {
